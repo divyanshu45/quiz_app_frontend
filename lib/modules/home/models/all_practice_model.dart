@@ -24,14 +24,14 @@ class AllPracticeModel {
   }
 }
 
-class PracticeData {
+class Data {
   List<Topic>? topic;
   int? subjectId;
   String? subjectName;
 
-  PracticeData({this.topic, this.subjectId, this.subjectName});
+  Data({this.topic, this.subjectId, this.subjectName});
 
-  PracticeData.fromJson(Map<String, dynamic> json) {
+  Data.fromJson(Map<String, dynamic> json) {
     if (json['topic'] != null) {
       topic = <Topic>[];
       json['topic'].forEach((v) {
