@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:quiz_app/modules/home/models/all_practice_model.dart';
-import 'package:quiz_app/modules/services/network_service.dart';
-
+import '../../../services/network_service.dart';
 import '../models/all_quiz_model.dart';
 
 class HomeRepository {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_app/modules/home/bloc/home_bloc.dart';
 import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
+import 'package:quiz_app/modules/result/ui/result_screen.dart';
 import 'package:quiz_app/modules/set/ui/set_screen.dart';
 import 'package:quiz_app/modules/splash/ui/splash_screen.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';

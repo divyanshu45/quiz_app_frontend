@@ -9,7 +9,7 @@ class RemoteService {
 
   void setUp() {
     BaseOptions dioOptions = BaseOptions(
-      baseUrl: "https://jsonplaceholder.typicode.com/",
+      baseUrl: "",
       contentType: Headers.formUrlEncodedContentType,
       responseType: ResponseType.json,
     );

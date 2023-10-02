@@ -53,7 +53,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 } else {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => ResultScreen())
+                    MaterialPageRoute(builder: (context) => ResultScreen(correct: 8, total: 10,))
                   );
                 }
               },
