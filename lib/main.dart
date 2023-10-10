@@ -7,6 +7,8 @@ import 'package:quiz_app/modules/set/ui/set_screen.dart';
 import 'package:quiz_app/modules/splash/ui/splash_screen.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
 
+import 'modules/quiz/bloc/quiz_bloc.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => HomeBloc()..add(FetchAllQuizEvent()),
+        ),
+        BlocProvider(
+          create: (context) => QuizBloc(),
         )
       ],
       child: MaterialApp(

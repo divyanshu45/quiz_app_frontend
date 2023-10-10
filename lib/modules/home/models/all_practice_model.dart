@@ -1,45 +1,28 @@
 class AllPracticeModel {
-  List<PracticeData>? practiceData;
-  String? modelName;
-
-  AllPracticeModel({this.practiceData, this.modelName});
-
-  AllPracticeModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      practiceData = <PracticeData>[];
-      json['data'].forEach((v) {
-        practiceData!.add(new PracticeData.fromJson(v));
-      });
-    }
-    modelName = json['model_name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.practiceData != null) {
-      data['data'] = this.practiceData!.map((v) => v.toJson()).toList();
-    }
-    data['model_name'] = this.modelName;
-    return data;
-  }
-}
-
-class PracticeData {
   List<Topic>? topic;
+  String? modelName;
   int? subjectId;
   String? subjectName;
+  int? imageId;
 
-  PracticeData({this.topic, this.subjectId, this.subjectName});
+  AllPracticeModel(
+      {this.topic,
+        this.modelName,
+        this.subjectId,
+        this.subjectName,
+        this.imageId});
 
-  PracticeData.fromJson(Map<String, dynamic> json) {
+  AllPracticeModel.fromJson(Map<String, dynamic> json) {
     if (json['topic'] != null) {
       topic = <Topic>[];
       json['topic'].forEach((v) {
         topic!.add(new Topic.fromJson(v));
       });
     }
+    modelName = json['model_name'];
     subjectId = json['subject_id'];
     subjectName = json['subject_name'];
+    imageId = json['image_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -47,8 +30,10 @@ class PracticeData {
     if (this.topic != null) {
       data['topic'] = this.topic!.map((v) => v.toJson()).toList();
     }
+    data['model_name'] = this.modelName;
     data['subject_id'] = this.subjectId;
     data['subject_name'] = this.subjectName;
+    data['image_id'] = this.imageId;
     return data;
   }
 }

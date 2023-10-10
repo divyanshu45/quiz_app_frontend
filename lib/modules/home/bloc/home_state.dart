@@ -16,10 +16,12 @@ class HomeLoadingState extends HomeState {
 }
 
 class HomeFetchedState extends HomeState {
-  final AllQuizModel allQuizModel;
-  final AllPracticeModel allPracticeModel;
+  final List<AllQuizModel> allQuizModel;
+  final List<AllPracticeModel> allPracticeModel;
+  final List<AllStateModel> allStateModel;
+  final List<AllExamModel> allExamModel;
 
-  const HomeFetchedState({required this.allQuizModel, required this.allPracticeModel});
+  const HomeFetchedState({required this.allQuizModel, required this.allPracticeModel, required this.allExamModel, required this.allStateModel});
 
   @override
   List<Object?> get props => [];

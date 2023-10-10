@@ -1,54 +1,34 @@
 class AllQuizModel {
-  List<Data>? data;
+  List<Topic>? topics;
   String? modelName;
+  int? subjectId;
+  String? subjectName;
+  int? imageId;
 
-  AllQuizModel({this.data, this.modelName});
+  AllQuizModel({this.topics, this.modelName, this.subjectId, this.subjectName,this.imageId});
 
   AllQuizModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+    if (json['topic'] != null) {
+      topics = <Topic>[];
+      json['topic'].forEach((v) {
+        topics!.add(new Topic.fromJson(v));
       });
     }
     modelName = json['model_name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['model_name'] = this.modelName;
-    return data;
-  }
-}
-
-class Data {
-  List<Topic>? topic;
-  int? subjectId;
-  String? subjectName;
-
-  Data({this.topic, this.subjectId, this.subjectName});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    if (json['topic'] != null) {
-      topic = <Topic>[];
-      json['topic'].forEach((v) {
-        topic!.add(new Topic.fromJson(v));
-      });
-    }
     subjectId = json['subject_id'];
     subjectName = json['subject_name'];
+    imageId = json['image_id'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.topic != null) {
-      data['topic'] = this.topic!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.topics != null) {
+      data['topic'] = this.topics!.map((v) => v.toJson()).toList();
     }
+    data['model_name'] = this.modelName;
     data['subject_id'] = this.subjectId;
     data['subject_name'] = this.subjectName;
+    data['image_id'] = this.imageId;
     return data;
   }
 }
@@ -74,7 +54,7 @@ class Topic {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.quiz != null) {
       data['quiz'] = this.quiz!.map((v) => v.toJson()).toList();
     }
@@ -101,7 +81,7 @@ class Quiz {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
     data['quiz_id'] = this.quizId;
     data['quiz_name'] = this.quizName;
     data['quiz_time'] = this.quizTime;

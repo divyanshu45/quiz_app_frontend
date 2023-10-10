@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/modules/home/models/all_quiz_model.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
-import '../../../set/ui/set_screen.dart';
-import '../../models/all_practice_model.dart';
+import '../../../../set/ui/set_screen.dart';
 
-class ModelHolderII extends StatelessWidget {
-  final Data? dataModel;
-  final PracticeData? practiceData;
-  const ModelHolderII({super.key, this.dataModel, this.practiceData});
+class AllExamModelHolder extends StatelessWidget {
+  final AllQuizModel allQuizModel;
+  const AllExamModelHolder({super.key, required this.allQuizModel});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(title: allQuizModel.subjectName ?? '', topics: allQuizModel.topics ?? [],)));
       },
       child: Container(
         padding: EdgeInsets.all(8),
@@ -37,7 +35,7 @@ class ModelHolderII extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  dataModel?.subjectName ?? '',
+                  allQuizModel.subjectName ?? '',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500
@@ -45,7 +43,7 @@ class ModelHolderII extends StatelessWidget {
                 ),
                 SizedBox(height: 2,),
                 Text(
-                  (dataModel?.topic?.length ?? 0).toString(),
+                  (allQuizModel.topics?.length ?? 0).toString(),
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w300

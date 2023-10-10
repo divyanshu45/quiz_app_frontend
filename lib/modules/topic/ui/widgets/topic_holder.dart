@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/modules/set/ui/set_screen.dart';
+import '../../../home/models/all_quiz_model.dart';
 
 class TopicHolder extends StatelessWidget {
-  const TopicHolder({super.key});
+  final Topic topic;
+  const TopicHolder({super.key, required this.topic});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class TopicHolder extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SetScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SetScreen(title: topic.topicName ?? '', sets: topic.quiz ?? [])));
         },
         child: Padding(
           padding: EdgeInsets.all(10),
@@ -33,7 +35,7 @@ class TopicHolder extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Topic Title',
+                    topic.topicName ?? '',
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500
@@ -41,7 +43,7 @@ class TopicHolder extends StatelessWidget {
                   ),
                   SizedBox(height: 2,),
                   Text(
-                    'Topic Sets no',
+                    (topic.quiz?.length ?? 0).toString(),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300

@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:quiz_app/modules/home/models/all_practice_model.dart';
-import 'package:quiz_app/modules/home/ui/widgets/model_holder.dart';
+import 'package:quiz_app/modules/home/ui/widgets/model_holders/all_quiz_model_holder.dart';
 import 'package:quiz_app/modules/subjects/ui/subjects_screen.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
 
-import '../../models/all_quiz_model.dart';
-import 'model_holder_II.dart';
+import '../../../models/all_quiz_model.dart';
+import '../model_holders/all_exam_model_holder.dart';
 
-class QuizCard extends StatefulWidget {
-  final bool isFirst;
-  final AllQuizModel? allQuizModel;
-  final AllPracticeModel? allPracticeModel;
-  const QuizCard({super.key, required this.isFirst, this.allQuizModel, this.allPracticeModel});
+class AllExamCard extends StatefulWidget {
+  final List<AllQuizModel> allQuizModel;
+  const AllExamCard({super.key, required this.allQuizModel});
 
   @override
-  State<QuizCard> createState() => _QuizCardState();
+  State<AllExamCard> createState() => _AllExamCardState();
 }
 
-class _QuizCardState extends State<QuizCard> {
+class _AllExamCardState extends State<AllExamCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,7 +28,7 @@ class _QuizCardState extends State<QuizCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                widget.allQuizModel?.modelName ?? '',
+                widget.allQuizModel[0].modelName ?? '',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700
@@ -47,7 +44,7 @@ class _QuizCardState extends State<QuizCard> {
                   padding: EdgeInsets.all(6)
                 ),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => SubjectsScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SubjectsScreen(title: widget.allQuizModel[0].modelName ?? '', subjects: widget.allQuizModel,)));
                 },
                 child: Text('View All'),
               ),
@@ -59,14 +56,7 @@ class _QuizCardState extends State<QuizCard> {
             scrollDirection: Axis.horizontal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: List.generate(widget.allQuizModel?.data?.length ?? 0, (index) => widget.allQuizModel != null
-                  
-                  ? widget.isFirst
-                    ? ModelHolder(dataModel: widget.allQuizModel!.data![index])
-                    : ModelHolderII(dataModel: widget.allQuizModel!.data![index])
-                  : widget.isFirst
-                    ? ModelHolder(practiceData: widget.allPracticeModel!.practiceData![index])
-                    : ModelHolderII(practiceData: widget.allPracticeModel!.practiceData![index])
+              children: List.generate(widget.allQuizModel.length ?? 0, (index) => AllExamModelHolder(allQuizModel: widget.allQuizModel[index])
               ),
             ),
           )

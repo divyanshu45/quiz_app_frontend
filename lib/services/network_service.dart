@@ -33,7 +33,7 @@ class RemoteService {
           )
       );
       return response;
-    } on DioException catch(e){
+    } on DioException catch (e) {
       throw CustomException(message: e.message ?? 'Custom message');
     }
   }
@@ -57,8 +57,8 @@ class RemoteService {
           )
       );
       return response;
-    } on DioException catch (error) {
-      rethrow;
+    } on DioException catch (e) {
+      throw CustomException(message: e.message ?? 'Custom message');
     }
   }
 
@@ -81,22 +81,8 @@ class RemoteService {
           )
       );
       return response;
-    } on DioException catch (error) {
-      rethrow;
-    }
-  }
-
-  Future<Response> delete({
-    required String path,
-    Map<String, dynamic>? queryParams,
-    Map<String, dynamic>? payload,
-  }) async {
-    try {
-      final response =
-      await _dio.delete(path, queryParameters: queryParams, data: payload);
-      return response;
-    } on DioException catch (error) {
-      rethrow;
+    } on DioException catch (e) {
+      throw CustomException(message: e.message ?? 'Custom message');
     }
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/modules/home/models/all_quiz_model.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
 
 class SubjectHolder extends StatelessWidget {
-  const SubjectHolder({super.key});
+  final AllQuizModel subject;
+  const SubjectHolder({super.key, required this.subject});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class SubjectHolder extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TopicScreen(title: subject.subjectName ?? '', topics: subject.topics ?? [])));
         },
         child: Padding(
           padding: EdgeInsets.all(10),
@@ -33,7 +35,7 @@ class SubjectHolder extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Subject Title',
+                    subject.subjectName ?? '',
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500
@@ -41,7 +43,7 @@ class SubjectHolder extends StatelessWidget {
                   ),
                   SizedBox(height: 2,),
                   Text(
-                    'Subject Topics no',
+                    (subject.topics?.length ?? 0).toString(),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300

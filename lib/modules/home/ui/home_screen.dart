@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:quiz_app/modules/home/ui/widgets/quiz_card.dart';
+import 'package:quiz_app/modules/home/ui/widgets/quiz_cards/all_exam_card.dart';
+import 'package:quiz_app/modules/home/ui/widgets/quiz_cards/all_practice_card.dart';
+import 'package:quiz_app/modules/home/ui/widgets/quiz_cards/all_quiz_card.dart';
+import 'package:quiz_app/modules/home/ui/widgets/quiz_cards/all_state_card.dart';
 
 import '../bloc/home_bloc.dart';
 
@@ -32,11 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    QuizCard(isFirst: true, allQuizModel: state.allQuizModel,),
+                    AllQuizCard(allQuizModel: state.allQuizModel),
                     SizedBox(height: 10,),
-                    QuizCard(isFirst: false, allQuizModel: state.allQuizModel),
+                    AllPracticeCard(allQuizModel: state.allQuizModel),
                     SizedBox(height: 10,),
-                    QuizCard(isFirst: true, allQuizModel: state.allQuizModel,)
+                    AllExamCard(allQuizModel: state.allQuizModel),
+                    SizedBox(height: 10,),
+                    AllStateCard(allQuizModel: state.allQuizModel)
                   ],
                 ),
               );

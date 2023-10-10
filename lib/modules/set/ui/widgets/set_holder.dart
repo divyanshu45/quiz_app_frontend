@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/modules/home/models/all_quiz_model.dart';
 import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
 
 class SetHolder extends StatelessWidget {
-  const SetHolder({super.key});
+  final Quiz set;
+  const SetHolder({super.key, required this.set});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class SetHolder extends StatelessWidget {
       ),
       child: InkWell(
         onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(id: set.quizId ?? -1)));
         },
         child: Padding(
           padding: EdgeInsets.all(10),
@@ -36,7 +38,7 @@ class SetHolder extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Subject Title',
+                          set.quizName ?? '',
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500
@@ -44,7 +46,7 @@ class SetHolder extends StatelessWidget {
                         ),
                         SizedBox(height: 2,),
                         Text(
-                          'Sets no',
+                          '10 questions',
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w300
