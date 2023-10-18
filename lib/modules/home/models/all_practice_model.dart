@@ -1,14 +1,14 @@
 class AllPracticeModel {
-  List<PracticeData>? practiceData;
+  List<Data>? practiceData;
   String? modelName;
 
   AllPracticeModel({this.practiceData, this.modelName});
 
   AllPracticeModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      practiceData = <PracticeData>[];
+      practiceData = <Data>[];
       json['data'].forEach((v) {
-        practiceData!.add(new PracticeData.fromJson(v));
+        practiceData!.add(Data.fromJson(v));
       });
     }
     modelName = json['model_name'];
@@ -24,14 +24,14 @@ class AllPracticeModel {
   }
 }
 
-class PracticeData {
+class Data {
   List<Topic>? topic;
   int? subjectId;
   String? subjectName;
 
-  PracticeData({this.topic, this.subjectId, this.subjectName});
+  Data({this.topic, this.subjectId, this.subjectName});
 
-  PracticeData.fromJson(Map<String, dynamic> json) {
+  Data.fromJson(Map<String, dynamic> json) {
     if (json['topic'] != null) {
       topic = <Topic>[];
       json['topic'].forEach((v) {
