@@ -13,6 +13,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // void handleFirebaseMessage() async {
+  //   RemoteMessage? message =
+  //       await FirebaseMessaging.instance.getInitialMessage();
+
+  //   if (message != null) {
+  //     _showProgress();
+  //     Contract? c =
+  //         await AppState.instance.searchAddress(message.data['address']);
+  //     _dismissprogress();
+  //     if (c != null) {
+  //       navigatorKey.currentState?.push(
+  //           MaterialPageRoute(builder: (context) => ContractExplore(c: c)));
+  //     }
+  //   }
+
+  //   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+  //     _showProgress();
+  //     Contract? c =
+  //         await AppState.instance.searchAddress(message.data['address']);
+  //     _dismissprogress();
+  //     if (c != null) {
+  //       navigatorKey.currentState?.push(
+  //           MaterialPageRoute(builder: (context) => ContractExplore(c: c)));
+  //       fetchAndParse();
+  //       fetchData();
+  //     }
+  //   });
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
