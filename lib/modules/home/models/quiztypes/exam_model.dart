@@ -1,39 +1,59 @@
-class AllExamModel {
-  List<Data>? data;
+import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 
-  AllExamModel({this.data});
+class ExamModel with GetTopicView {
+  List<ExamData>? data;
 
-  AllExamModel.fromJson(Map<String, dynamic> json) {
+  ExamModel({this.data});
+
+  ExamModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <ExamData>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(ExamData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = {};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
+
+  @override
+  List<TopicView> topicViews() {
+    List<TopicView> subjects = [];
+    data?.forEach((element) {
+      List<SetsDataView> topics = [];
+      element.examSet!.forEach((element) {
+        topics.add(SetsDataView(
+            timeLimit: element.examSetTime!,
+            title: element.examSetName!,
+            setId: element.examSetId!
+            ));
+      });
+
+      subjects.add(TopicView(title: element.examName!, sets: topics));
+    });
+    return subjects;
+  }
 }
 
-class Data {
+class ExamData {
   List<ExamSet>? examSet;
   String? modelName;
   int? examId;
   String? examName;
 
-  Data({this.examSet, this.modelName, this.examId, this.examName});
+  ExamData({this.examSet, this.modelName, this.examId, this.examName});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  ExamData.fromJson(Map<String, dynamic> json) {
     if (json['exam_set'] != null) {
       examSet = <ExamSet>[];
       json['exam_set'].forEach((v) {
-        examSet!.add(new ExamSet.fromJson(v));
+        examSet!.add(ExamSet.fromJson(v));
       });
     }
     modelName = json['model_name'];
@@ -42,13 +62,13 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.examSet != null) {
-      data['exam_set'] = this.examSet!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = {};
+    if (examSet != null) {
+      data['exam_set'] = examSet!.map((v) => v.toJson()).toList();
     }
-    data['model_name'] = this.modelName;
-    data['exam_id'] = this.examId;
-    data['exam_name'] = this.examName;
+    data['model_name'] = modelName;
+    data['exam_id'] = examId;
+    data['exam_name'] = examName;
     return data;
   }
 }

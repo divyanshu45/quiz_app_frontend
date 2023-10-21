@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_app/modules/home/bloc/home_bloc.dart';
+import 'package:quiz_app/modules/home/ui/home_screen.dart';
 import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
 import 'package:quiz_app/modules/result/ui/result_screen.dart';
 import 'package:quiz_app/modules/set/ui/set_screen.dart';
@@ -23,14 +24,13 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: SplashScreen()
-      ),
+          title: 'Quiz App',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: HomeScreen()),
     );
   }
 }

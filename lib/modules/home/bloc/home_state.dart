@@ -12,14 +12,19 @@ class HomeInitial extends HomeState {
 class HomeLoadingState extends HomeState {
   @override
   List<Object?> get props => [];
-
 }
 
 class HomeFetchedState extends HomeState {
-  final AllQuizModel allQuizModel;
-  final AllPracticeModel allPracticeModel;
+  final QuizModel quizModel;
+  final LearningModel practiceModel;
+  final StateModel stateModel;
+  final ExamModel examModel;
 
-  const HomeFetchedState({required this.allQuizModel, required this.allPracticeModel});
+  const HomeFetchedState(
+      {required this.quizModel,
+      required this.practiceModel,
+      required this.examModel,
+      required this.stateModel});
 
   @override
   List<Object?> get props => [];

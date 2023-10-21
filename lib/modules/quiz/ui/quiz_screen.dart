@@ -1,174 +1,375 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:quiz_app/modules/quiz/models/question.dart';
+import 'package:flutter/services.dart';
+import 'package:quiz_app/modules/home/models/Question/mixin/questions.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/state_model.dart';
+import 'package:quiz_app/modules/home/repository/repository.dart';
 import 'package:quiz_app/modules/result/ui/result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  final bool isLocked;
+  final GetTopicView dataModel;
+  final int quizID;
+  final int time;
+  const QuizScreen(
+      {super.key,
+      this.isLocked = false,
+      required this.dataModel,
+      required this.quizID,
+      required this.time});
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  Future<GetQuestionsForQuizView>? question;
+  bool isLocked = false;
+  int currentQuestion = 0;
+  late int secondsLeft;
+  Timer? timer;
 
-  int question_number = 1;
+  AudioPlayer audioPlayer = AudioPlayer();
+
+  // -1 means not selected
+  List<int>? selectedAnswers;
+
+  void setFutureAndFetchQuiz() {
+    final repository = Repository();
+
+    if (widget.dataModel is ExamModel) {
+      question = repository.examQuestions(widget.quizID);
+      return;
+    }
+
+    if (widget.dataModel is QuizData) {
+      question = repository.quizQuestions(widget.quizID);
+      return;
+    }
+
+    if (widget.dataModel is StateModel) {
+      question = repository.stateQuestions(widget.quizID);
+      return;
+    }
+  }
+
+  void moveToNextQuestion(List<QuestionsForQuizView> questions) {
+    if (currentQuestion + 1 < questions.length) {
+      _pageController.nextPage(
+          duration: Duration(milliseconds: 500), curve: Curves.easeInExpo);
+      setState(() {
+        currentQuestion++;
+        secondsLeft = widget.time;
+      });
+      startTimer(questions);
+      return;
+    }
+    if (timer != null) {
+      timer?.cancel();
+    }
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ResultScreen(
+                  correct: 8,
+                  total: 10,
+                )));
+  }
+
+  void startTimer(List<QuestionsForQuizView> questions) {
+    if (timer != null) {
+      timer?.cancel();
+    }
+
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (secondsLeft - 1 < 0) {
+        moveToNextQuestion(questions);
+        return;
+      }
+      setState(() {
+        secondsLeft--;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setFutureAndFetchQuiz();
+    secondsLeft = widget.time;
+  }
 
   final PageController _pageController = PageController(initialPage: 0);
-
-  bool isLocked = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          children: [
-            SizedBox(height: 10,),
-            Text(
-              '$question_number / ${questions.length}',
-            ),
-            SizedBox(height: 10,),
-            Divider(),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return buildQuestion(questions[index]);
-                },
-              )
-            ),
-            isLocked ? ElevatedButton(
-              onPressed: (){
-                if(question_number < questions.length) {
-                  _pageController.nextPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInExpo
-                  );
-                  setState(() {
-                    question_number++;
-                    isLocked = false;
-                  });
-                } else {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ResultScreen(correct: 8, total: 10,))
-                  );
-                }
-              },
-              child: Text(
-                question_number < questions.length
-                  ? 'Next'
-                  : 'Finish'
-              )
-            ) : const SizedBox.shrink()
-          ],
-        ),
+        body: FutureBuilder(
+            future: question,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text("Loading..."),
+                    ],
+                  )),
+                );
+              }
+
+              final questions = snapshot.data!.questions();
+
+              if (selectedAnswers == null) {
+                startTimer(questions);
+                selectedAnswers = List.filled(questions.length, -1);
+              }
+
+              return Column(
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            // Show dialog to cancel.
+                            showDialog(
+                                context: context,
+                                builder: (_) {
+                                  return AlertDialog(
+                                    title: Text('Do you want to exit quiz?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: Text('Yes'),
+                                      ),
+                                    ],
+                                  );
+                                }).then((exit) {
+                              if (exit == null) return;
+                              if (exit) {
+                                Navigator.pop(context);
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      Text(
+                        '${currentQuestion + 1}/ ${questions.length}',
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Text('$secondsLeft seconds'),
+                      ),
+                    ],
+                  ),
+                  Divider(),
+                  Flexible(
+                      child: PageView.builder(
+                    controller: _pageController,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: questions.length,
+                    itemBuilder: (context, index) {
+                      return buildQuestion(questions, index);
+                    },
+                  )),
+                ],
+              );
+            }),
       ),
     );
   }
 
-  Widget buildQuestion(Question question) {
+  Widget buildQuestion(
+      List<QuestionsForQuizView> questions, int questionIndex) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(height: 20,)  ,
-        Text(
-          question.question,
-          style: TextStyle(
-            fontSize: 20,
+        SizedBox(
+          height: 20,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            questions[questionIndex].questionName,
+            style: TextStyle(
+              fontSize: 20,
+            ),
           ),
         ),
-        SizedBox(height: 10,),
+        SizedBox(
+          height: 10,
+        ),
         Expanded(
-          child: OptionsWidget(
-            question: question,
-            onClickedOption: (option) {
-              if(question.isLocked) {
-                return;
-              } else {
-                setState(() {
-                  question.isLocked = true;
-                  question.selectedOption = option;
-                });
-                isLocked = question.isLocked;
-              }
-            },
-          ),
-        )
+            child: SingleChildScrollView(
+                child: Column(
+          children: [
+            buildOptionWidget(questions, questionIndex, 1),
+            buildOptionWidget(questions, questionIndex, 2),
+            buildOptionWidget(questions, questionIndex, 3),
+            buildOptionWidget(questions, questionIndex, 4),
+            isQuestionAnswered(currentQuestion)
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: ElevatedButton(
+                        onPressed: () => moveToNextQuestion(questions),
+                        child: Text(currentQuestion + 1 < questions.length
+                            ? 'Next'
+                            : 'Finish')),
+                  )
+                : const SizedBox.shrink()
+          ],
+        )))
       ],
     );
   }
-}
 
-class OptionsWidget extends StatelessWidget {
-  final Question question;
-  final ValueChanged<Option> onClickedOption;
-  const OptionsWidget({super.key, required this.question, required this.onClickedOption});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: question.options
-            .map((option) => buildOptionWidget(context, option))
-            .toList()
-      ),
-    );
+  bool isQuestionAnswered(int questionIndex) {
+    return selectedAnswers![questionIndex] != -1;
   }
 
-  Widget buildOptionWidget(BuildContext context, Option option) {
-    final color = getColorOption(option, question);
+  String getOptionText(QuestionsForQuizView question, int option) {
+    switch (option) {
+      case 1:
+        return question.optionA;
+      case 2:
+        return question.optionB;
+      case 3:
+        return question.optionC;
+      case 4:
+      default:
+        return question.optionD;
+    }
+  }
+
+  int getOptionInt(String option) {
+    switch (option) {
+      case "option_a":
+        return 1;
+      case "option_b":
+        return 2;
+      case "option_c":
+        return 3;
+      case "option_d":
+      default:
+        return 4;
+    }
+  }
+
+  Widget buildOptionWidget(
+      List<QuestionsForQuizView> question, int questionIndex, int option) {
+    final optionText = getOptionText(question[questionIndex], option);
+    final color = getColorOption(question, questionIndex, option);
     return InkWell(
       onTap: () {
-        onClickedOption(option);
+        final isSelected = isQuestionAnswered(questionIndex);
+        if (isSelected) return;
+        if (timer != null) {
+          timer?.cancel();
+        }
+        setState(() {
+          selectedAnswers![questionIndex] = option;
+        });
+
+        final correctOptionIndex =
+            getOptionInt(question[questionIndex].correctOption);
+
+        audioPlayer.stop();
+        if (correctOptionIndex == option) {
+          audioPlayer.play(AssetSource('sounds/quiz-correct.mp3'));
+        } else {
+          audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+        }
+        HapticFeedback.vibrate();
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color)
-        ),
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              option.text,
-              style: TextStyle(
-                fontSize: 20
+            Expanded(
+              child: Text(
+                optionText,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
               ),
             ),
-            getIconForOption(option, question)
+            getIconForOption(question, questionIndex, option)
           ],
         ),
       ),
     );
   }
 
-  Color getColorOption(Option option, Question question) {
-    final isSelected = option == question.selectedOption;
-    if(question.isLocked) {
-      if(isSelected) {
-        return option.isCorrect ? Colors.green : Colors.red;
-      } else if(option.isCorrect) {
-        return Colors.green;
-      }
+  Color getColorOption(
+      List<QuestionsForQuizView> question, int questionIndex, int option) {
+    final isSelected = isQuestionAnswered(questionIndex);
+    if (!isSelected) return Colors.grey.shade300;
+    final selectedOption = selectedAnswers![questionIndex];
+    final correctOptionIndex =
+        getOptionInt(question[questionIndex].correctOption);
+    if (correctOptionIndex == option) {
+      return Colors.green;
+    }
+    if ((selectedOption == option) && (correctOptionIndex != option)) {
+      return Colors.red;
     }
     return Colors.grey.shade300;
   }
 
-  Widget getIconForOption(Option option, Question question) {
-    final isSelected = option == question.selectedOption;
-    if(question.isLocked) {
-      if(isSelected) {
-        return option.isCorrect
-            ? Icon(Icons.check_circle, color: Colors.green,)
-            : Icon(Icons.cancel, color: Colors.red,);
-      } else if(option.isCorrect) {
-        return Icon(Icons.check_circle, color: Colors.green,);
-      }
+  Widget getIconForOption(
+    List<QuestionsForQuizView> question,
+    int questionIndex,
+    int option,
+  ) {
+    final isSelected = isQuestionAnswered(questionIndex);
+    if (!isSelected) return const SizedBox.shrink();
+    final selectedOption = selectedAnswers![questionIndex];
+    final correctOptionIndex =
+        getOptionInt(question[questionIndex].correctOption);
+    if (correctOptionIndex == option) {
+      return const Icon(
+        Icons.check,
+        color: Colors.green,
+      );
+    }
+    if ((selectedOption == option) && (correctOptionIndex != option)) {
+      return const Icon(
+        Icons.close,
+        color: Colors.red,
+      );
     }
     return const SizedBox.shrink();
   }

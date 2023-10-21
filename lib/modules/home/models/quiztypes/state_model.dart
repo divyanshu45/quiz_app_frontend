@@ -1,39 +1,58 @@
-class AllStateModel {
-  List<Data>? data;
+import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 
-  AllStateModel({this.data});
+class StateModel with GetTopicView {
+  List<StateData>? data;
 
-  AllStateModel.fromJson(Map<String, dynamic> json) {
+  StateModel({this.data});
+
+  StateModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <StateData>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(StateData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = {};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
+
+  @override
+  List<TopicView> topicViews() {
+    List<TopicView> subjects = [];
+    data?.forEach((element) {
+      List<SetsDataView> topics = [];
+      element.stateSet!.forEach((element) {
+        topics.add(SetsDataView(
+            timeLimit: element.stateSetTime!,
+            title: element.stateSetName!,
+            setId: element.stateSetId!));
+      });
+
+      subjects.add(TopicView(title: element.stateName!, sets: topics));
+    });
+    return subjects;
+  }
 }
 
-class Data {
+class StateData {
   List<StateSet>? stateSet;
   String? modelName;
   int? stateId;
   String? stateName;
 
-  Data({this.stateSet, this.modelName, this.stateId, this.stateName});
+  StateData({this.stateSet, this.modelName, this.stateId, this.stateName});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  StateData.fromJson(Map<String, dynamic> json) {
     if (json['state_set'] != null) {
       stateSet = <StateSet>[];
       json['state_set'].forEach((v) {
-        stateSet!.add(new StateSet.fromJson(v));
+        stateSet!.add(StateSet.fromJson(v));
       });
     }
     modelName = json['model_name'];
@@ -42,13 +61,13 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.stateSet != null) {
-      data['state_set'] = this.stateSet!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = {};
+    if (stateSet != null) {
+      data['state_set'] = stateSet!.map((v) => v.toJson()).toList();
     }
-    data['model_name'] = this.modelName;
-    data['state_id'] = this.stateId;
-    data['state_name'] = this.stateName;
+    data['model_name'] = modelName;
+    data['state_id'] = stateId;
+    data['state_name'] = stateName;
     return data;
   }
 }

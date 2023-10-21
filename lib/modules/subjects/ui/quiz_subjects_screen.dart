@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
-import 'package:quiz_app/modules/set/ui/set_screen.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
+import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
 
-class TopicScreen extends StatefulWidget {
-  final GetTopicView topicView;
+class QuizSubjectScreen extends StatefulWidget {
   final String pageTitle;
-  const TopicScreen({
-    super.key,
-    required this.pageTitle,
-    required this.topicView,
-  });
+  final QuizModel quizModel;
+  const QuizSubjectScreen(
+      {super.key, required this.pageTitle, required this.quizModel});
 
   @override
-  State<TopicScreen> createState() => _TopicScreenState();
+  State<QuizSubjectScreen> createState() => _QuizSubjectScreenState();
 }
 
-class _TopicScreenState extends State<TopicScreen> {
+class _QuizSubjectScreenState extends State<QuizSubjectScreen> {
   @override
   Widget build(BuildContext context) {
-    final topicViews = widget.topicView.topicViews();
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
             title: Text(widget.pageTitle),
           ),
           body: ListView.builder(
-            itemCount: topicViews.length,
+            itemCount: widget.quizModel.data!.length,
             itemBuilder: (context, index) {
-              return _SetsHolder(
-                topicView: widget.topicView,
-                topicIndex: index,
+              return QuizHolder(
+                quizData: widget.quizModel.data![index],
               );
             },
           )),
@@ -37,15 +33,12 @@ class _TopicScreenState extends State<TopicScreen> {
   }
 }
 
-class _SetsHolder extends StatelessWidget {
-  final GetTopicView topicView;
-  final int topicIndex;
-  const _SetsHolder(
-      {super.key, required this.topicView, required this.topicIndex});
+class QuizHolder extends StatelessWidget {
+  final QuizData quizData;
+  const QuizHolder({super.key, required this.quizData});
 
   @override
   Widget build(BuildContext context) {
-    final sets = topicView.topicViews();
     return Container(
       margin: EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -58,10 +51,9 @@ class _SetsHolder extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => SetScreen(
-                        mainTopicViewObj: topicView,
-                        pageTitle: sets[topicIndex].title,
-                        topicIndex: topicIndex,
+                  builder: (context) => TopicScreen(
+                        pageTitle: quizData.subjectName ?? "",
+                        topicView: quizData,
                       )));
         },
         child: Padding(
@@ -81,14 +73,14 @@ class _SetsHolder extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    sets[topicIndex].title,
+                    quizData.subjectName ?? " ",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(
                     height: 2,
                   ),
                   Text(
-                    "${sets[topicIndex].sets.length} Sets",
+                    "${quizData.topic!.length} Topics",
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
                   ),
                 ],

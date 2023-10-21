@@ -10,7 +10,6 @@ class ResultScreen extends StatefulWidget {
 }
 
 class _ResultScreenState extends State<ResultScreen> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
