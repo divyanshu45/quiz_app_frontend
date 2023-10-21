@@ -306,7 +306,7 @@ class _QuizScreenState extends State<QuizScreen> {
         } else {
           audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
         }
-        HapticFeedback.vibrate();
+        HapticFeedback.heavyImpact();
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
