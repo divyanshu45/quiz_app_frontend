@@ -1,50 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/modules/home/models/history_model.dart';
 
 class ResultScreen extends StatefulWidget {
-  final int correct;
-  final int total;
-  const ResultScreen({super.key, required this.correct, required this.total});
+  final HistoryData result;
+  const ResultScreen({super.key, required this.result});
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
 class _ResultScreenState extends State<ResultScreen> {
+  double getCorrectScore() {
+    int questions = widget.result.totalQuestions;
+    if (widget.result.totalQuestions == 0) questions = 1;
+    return (widget.result.correctQuestions * 100) / questions;
+  }
+
+  double getWrongScore() {
+    int questions = widget.result.totalQuestions;
+    if (widget.result.totalQuestions == 0) questions = 1;
+    return (widget.result.wrongQuestions * 100) / questions;
+  }
+
+  double getTimeUpScore() {
+    int questions = widget.result.totalQuestions;
+    if (widget.result.totalQuestions == 0) questions = 1;
+    return ((widget.result.missedQuestions) * 100) / questions;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Result'
-          ),
+          title: Text('Result'),
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 20,),
-              FlutterLogo(size: 80,),
-              SizedBox(height: 20,),
-              Text(
-                'Your score'
+              SizedBox(
+                height: 20,
               ),
-              SizedBox(height: 10,),
-              Text(
-                '${widget.correct} / ${widget.total}',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold
-                ),
+              FlutterLogo(
+                size: 80,
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
+              Text('Your score'),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                '${widget.result.correctQuestions} / ${widget.result.totalQuestions}',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               Text(
                 'Keep trying! With more study and practice,\nyou will improve your GK knowledge',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16
-                ),
+                style: TextStyle(fontSize: 16),
               ),
-              SizedBox(height: 50,),
+              SizedBox(
+                height: 50,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -54,15 +75,13 @@ class _ResultScreenState extends State<ResultScreen> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          Text(
-                            '60%'
-                          ),
+                          Text(getCorrectScore().toStringAsFixed(0) + '%'),
                           Container(
                             height: 80,
                             width: 80,
                             margin: EdgeInsets.symmetric(horizontal: 10),
                             child: CircularProgressIndicator(
-                              value: widget.correct / widget.total,
+                              value: getCorrectScore() / 100,
                               strokeWidth: 14,
                               backgroundColor: Colors.grey.shade200,
                               color: Colors.green,
@@ -70,10 +89,10 @@ class _ResultScreenState extends State<ResultScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20,),
-                      Text(
-                        'Correct'
-                      )
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text('Correct')
                     ],
                   ),
                   Column(
@@ -82,15 +101,13 @@ class _ResultScreenState extends State<ResultScreen> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          Text(
-                              '60%'
-                          ),
+                          Text(getCorrectScore().toStringAsFixed(0) + '%'),
                           Container(
                             height: 80,
                             width: 80,
                             margin: EdgeInsets.symmetric(horizontal: 10),
                             child: CircularProgressIndicator(
-                              value: widget.correct / widget.total,
+                              value: getTimeUpScore() / 100,
                               strokeWidth: 14,
                               backgroundColor: Colors.grey.shade200,
                               color: Colors.indigo,
@@ -98,10 +115,10 @@ class _ResultScreenState extends State<ResultScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20,),
-                      Text(
-                          'Perecntage'
-                      )
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text('Time up')
                     ],
                   ),
                   Column(
@@ -110,15 +127,13 @@ class _ResultScreenState extends State<ResultScreen> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          Text(
-                              '60%'
-                          ),
+                          Text(getWrongScore().toStringAsFixed(0) + '%'),
                           Container(
                             height: 80,
                             width: 80,
                             margin: EdgeInsets.symmetric(horizontal: 10),
                             child: CircularProgressIndicator(
-                              value: widget.correct / widget.total,
+                              value: getWrongScore() / 100,
                               strokeWidth: 14,
                               backgroundColor: Colors.grey.shade200,
                               color: Colors.red,
@@ -126,63 +141,50 @@ class _ResultScreenState extends State<ResultScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20,),
-                      Text(
-                          'Wrong'
-                      )
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text('Wrong')
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   OutlinedButton(
-                    onPressed: (){},
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: Colors.blue
-                      ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                    ),
-                    child: Text(
-                      'RESTART',
-                      style: TextStyle(
-                        color: Colors.blue
-                      ),
-                    )
-                  ),
-                  OutlinedButton(
-                      onPressed: (){},
+                      onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: Colors.purple
-                          ),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                      ),
+                          side: BorderSide(color: Colors.blue),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8))),
                       child: Text(
-                          'REVIEW',
-                        style: TextStyle(
-                            color: Colors.purple
-                        ),
-                      )
-                  ),
+                        'RESTART',
+                        style: TextStyle(color: Colors.blue),
+                      )),
                   OutlinedButton(
-                      onPressed: (){},
+                      onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: Colors.orange
-                          ),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                      ),
+                          side: BorderSide(color: Colors.purple),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8))),
                       child: Text(
-                          'SHARE',
-                        style: TextStyle(
-                            color: Colors.orange
-                        ),
-                      )
-                  )
+                        'REVIEW',
+                        style: TextStyle(color: Colors.purple),
+                      )),
+                  OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.orange),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8))),
+                      child: Text(
+                        'SHARE',
+                        style: TextStyle(color: Colors.orange),
+                      ))
                 ],
               )
             ],

@@ -43,7 +43,6 @@ dependencies:
   audioplayers: ^5.2.0
   firebase_core: ^2.19.0
   firebase_messaging: ^14.7.1
-  
 
 dev_dependencies:
   flutter_test:

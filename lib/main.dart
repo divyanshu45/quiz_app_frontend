@@ -4,9 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_app/modules/home/bloc/home_bloc.dart';
 import 'package:quiz_app/modules/home/ui/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:quiz_app/services/local_history_service.dart';
 import 'firebase_options.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  final historyService = HistoryService.instance;
+  historyService.initializeHistory();
   runApp(const MyApp());
 }
 
@@ -18,7 +22,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static void initalize() async {
+  static void initialize() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -44,7 +48,7 @@ class _MyAppState extends State<MyApp> {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    initalize();
+    initialize();
   }
 
   @override

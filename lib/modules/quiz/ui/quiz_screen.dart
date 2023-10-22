@@ -4,12 +4,14 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quiz_app/modules/home/models/Question/mixin/questions.dart';
+import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/state_model.dart';
 import 'package:quiz_app/modules/home/repository/repository.dart';
 import 'package:quiz_app/modules/result/ui/result_screen.dart';
+import 'package:quiz_app/services/local_history_service.dart';
 
 class QuizScreen extends StatefulWidget {
   final bool isLocked;
@@ -58,6 +60,49 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
+  HistoryData saveHistory(List<QuestionsForQuizView> questions) {
+    int totalQuestions = questions.length;
+    if (totalQuestions <= 0) {
+      return HistoryData(
+          quizId: widget.quizID,
+          quizType: HistoryService.getQuizType(widget.dataModel),
+          correctQuestions: 0,
+          wrongQuestions: 0,
+          missedQuestions: 0,
+          selectedAnswers: [],
+          totalQuestions: 0);
+    }
+
+    int quizId = widget.quizID;
+    String quizType = HistoryService.getQuizType(widget.dataModel);
+    int correctQuestions = 0;
+    int wrongQuestions = 0;
+    int missedQuestions = 0;
+    for (int i = 0; i < totalQuestions; i++) {
+      if (selectedAnswers![i] == getOptionInt(questions[i].correctOption)) {
+        correctQuestions++;
+      } else if (selectedAnswers![i] == 5) {
+        missedQuestions++;
+      } else {
+        wrongQuestions++;
+      }
+    }
+    final historyService = HistoryService.instance;
+
+    final historyData = HistoryData(
+        quizId: quizId,
+        quizType: quizType,
+        correctQuestions: correctQuestions,
+        wrongQuestions: wrongQuestions,
+        missedQuestions: missedQuestions,
+        selectedAnswers: selectedAnswers ?? [],
+        totalQuestions: totalQuestions);
+
+    historyService.addHistory(historyData);
+
+    return historyData;
+  }
+
   void moveToNextQuestion(List<QuestionsForQuizView> questions) {
     if (currentQuestion + 1 < questions.length) {
       _pageController.nextPage(
@@ -72,12 +117,14 @@ class _QuizScreenState extends State<QuizScreen> {
     if (timer != null) {
       timer?.cancel();
     }
+    // Save History.
+    final result = saveHistory(questions);
+
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => ResultScreen(
-                  correct: 8,
-                  total: 10,
+                  result: result,
                 )));
   }
 
@@ -88,6 +135,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (secondsLeft - 1 < 0) {
+        audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+        selectedAnswers![currentQuestion] = 5;
         moveToNextQuestion(questions);
         return;
       }
@@ -137,6 +186,12 @@ class _QuizScreenState extends State<QuizScreen> {
               if (selectedAnswers == null) {
                 startTimer(questions);
                 selectedAnswers = List.filled(questions.length, -1);
+
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                  if (selectedAnswers!.isEmpty) {
+                    moveToNextQuestion(questions);
+                  }
+                });
               }
 
               return Column(
@@ -234,6 +289,7 @@ class _QuizScreenState extends State<QuizScreen> {
             buildOptionWidget(questions, questionIndex, 2),
             buildOptionWidget(questions, questionIndex, 3),
             buildOptionWidget(questions, questionIndex, 4),
+            if (selectedAnswers![questionIndex] == 5) Text("Time's up!"),
             isQuestionAnswered(currentQuestion)
                 ? Padding(
                     padding: const EdgeInsets.only(top: 20),
