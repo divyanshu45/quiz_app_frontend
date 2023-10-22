@@ -28,6 +28,20 @@ class _ResultScreenState extends State<ResultScreen> {
     return (widget.result.correctQuestions * 100) / questions;
   }
 
+  String message() {
+    if (getCorrectScore() > 80) {
+      return 'You are doing great!';
+    }
+    if (getCorrectScore() > 60) {
+      return 'You are doing good!';
+    }
+    if (getCorrectScore() > 40) {
+      return 'You need to improve!\nyou will improve your GK knowledge';
+    }
+
+    return 'Keep trying! With more study and practice,\nyou will improve your GK knowledge';
+  }
+
   double getWrongScore() {
     int questions = widget.result.totalQuestions;
     if (widget.result.totalQuestions == 0) questions = 1;
@@ -38,6 +52,19 @@ class _ResultScreenState extends State<ResultScreen> {
     int questions = widget.result.totalQuestions;
     if (widget.result.totalQuestions == 0) questions = 1;
     return ((widget.result.missedQuestions) * 100) / questions;
+  }
+
+  IconData iconResult() {
+    if (getCorrectScore() > 80) {
+      return Icons.sentiment_very_satisfied;
+    }
+    if (getCorrectScore() > 60) {
+      return Icons.sentiment_very_satisfied;
+    }
+    if (getCorrectScore() > 40) {
+      return Icons.sentiment_very_dissatisfied_sharp;
+    }
+    return Icons.sentiment_very_dissatisfied_sharp;
   }
 
   @override
@@ -53,7 +80,8 @@ class _ResultScreenState extends State<ResultScreen> {
               SizedBox(
                 height: 20,
               ),
-              FlutterLogo(
+              Icon(
+                iconResult(),
                 size: 80,
               ),
               SizedBox(
@@ -71,7 +99,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 height: 20,
               ),
               Text(
-                'Keep trying! With more study and practice,\nyou will improve your GK knowledge',
+                message(),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),
