@@ -75,7 +75,6 @@ class QuizTopicView extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        print(dataModel!.toJson().toString());
         Navigator.push(
             context,
             MaterialPageRoute(

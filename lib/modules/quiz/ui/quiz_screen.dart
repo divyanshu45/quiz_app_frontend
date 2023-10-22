@@ -15,22 +15,26 @@ import 'package:quiz_app/modules/result/ui/result_screen.dart';
 import 'package:quiz_app/services/local_history_service.dart';
 
 class QuizScreen extends StatefulWidget {
-  final bool isLocked;
   final GetTopicView dataModel;
   final int quizID;
   final int time;
+  final List<int>? selectedAnswers;
   const QuizScreen(
       {super.key,
-      this.isLocked = false,
       required this.dataModel,
       required this.quizID,
-      required this.time});
+      required this.time,
+      this.selectedAnswers});
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  bool togglePlaySound = true;
+  bool toggleHasTime = true;
+  bool toggleVibrate = true;
+
   Future<GetQuestionsForQuizView>? question;
   bool isLocked = false;
   int currentQuestion = 0;
@@ -129,6 +133,9 @@ class _QuizScreenState extends State<QuizScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => ResultScreen(
+                  dataModel: widget.dataModel,
+                  quizID: widget.quizID,
+                  time: widget.time,
                   result: result,
                 )));
   }
@@ -140,13 +147,17 @@ class _QuizScreenState extends State<QuizScreen> {
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (secondsLeft - 1 < 0) {
-        audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+        if (togglePlaySound) {
+          audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+        }
         selectedAnswers![currentQuestion] = 5;
         moveToNextQuestion(questions);
         return;
       }
       setState(() {
-        secondsLeft--;
+        if (toggleHasTime) {
+          secondsLeft--;
+        }
       });
     });
   }
@@ -156,6 +167,7 @@ class _QuizScreenState extends State<QuizScreen> {
     super.initState();
     setFutureAndFetchQuiz();
     secondsLeft = widget.time;
+    toggleHasTime = widget.selectedAnswers == null;
   }
 
   final PageController _pageController = PageController(initialPage: 0);
@@ -190,7 +202,11 @@ class _QuizScreenState extends State<QuizScreen> {
 
               if (selectedAnswers == null) {
                 startTimer(questions);
-                selectedAnswers = List.filled(questions.length, -1);
+                if (widget.selectedAnswers == null) {
+                  selectedAnswers = List.filled(questions.length, -1);
+                } else {
+                  selectedAnswers = widget.selectedAnswers;
+                }
 
                 WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                   if (selectedAnswers!.isEmpty) {
@@ -245,7 +261,60 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right: 20),
-                        child: Text('$secondsLeft seconds'),
+                        child: Row(
+                          children: [
+                            Text('$secondsLeft seconds'),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            PopupMenuButton(
+                              onSelected: (v) {
+                                switch (v) {
+                                  case "toggleTimer":
+                                    toggleHasTime = !toggleHasTime;
+                                  case "toggleSound":
+                                    togglePlaySound = !togglePlaySound;
+                                  case "toggleVibrate":
+                                    toggleVibrate = !toggleVibrate;
+                                  default:
+                                    setState(() {});
+                                }
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                PopupMenuItem(
+                                  value: "toggleTimer",
+                                  child: CheckboxListTile(
+                                    value: toggleHasTime,
+                                    title: Text("Timer"),
+                                    onChanged: (b) {
+                                      Navigator.pop(context, "toggleTimer");
+                                    },
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: "toggleSound",
+                                  child: CheckboxListTile(
+                                    value: togglePlaySound,
+                                    title: Text("Sound"),
+                                    onChanged: (b) {
+                                      Navigator.pop(context, "toggleSound");
+                                    },
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: "toggleVibrate",
+                                  child: CheckboxListTile(
+                                    value: toggleVibrate,
+                                    title: Text("Vibrate"),
+                                    onChanged: (b) {
+                                      Navigator.pop(context, "toggleVibrate");
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -362,12 +431,16 @@ class _QuizScreenState extends State<QuizScreen> {
             getOptionInt(question[questionIndex].correctOption);
 
         audioPlayer.stop();
-        if (correctOptionIndex == option) {
-          audioPlayer.play(AssetSource('sounds/quiz-correct.mp3'));
-        } else {
-          audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+        if (togglePlaySound) {
+          if (correctOptionIndex == option) {
+            audioPlayer.play(AssetSource('sounds/quiz-correct.mp3'));
+          } else {
+            audioPlayer.play(AssetSource('sounds/quiz-error.mp3'));
+          }
         }
-        HapticFeedback.heavyImpact();
+        if (toggleVibrate) {
+          HapticFeedback.heavyImpact();
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),

@@ -5,7 +5,6 @@ import 'package:quiz_app/modules/home/models/quiztypes/learning_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/state_model.dart';
 import 'package:quiz_app/modules/home/repository/repository.dart';
-import 'package:quiz_app/services/local_history_service.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -27,7 +26,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             practiceModel: await practiceModel,
             examModel: await examModel,
             stateModel: await stateModel));
-        print((await quizModel).toJson().toString());
       } catch (e) {
         emit(HomeErrorState(message: e.toString()));
       }

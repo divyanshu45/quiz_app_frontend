@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/modules/home/models/history_model.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
+import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
 
 class ResultScreen extends StatefulWidget {
   final HistoryData result;
-  const ResultScreen({super.key, required this.result});
+  final GetTopicView dataModel;
+  final int quizID;
+  final int time;
+  const ResultScreen({
+    super.key,
+    required this.result,
+    required this.dataModel,
+    required this.quizID,
+    required this.time,
+  });
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -156,7 +167,16 @@ class _ResultScreenState extends State<ResultScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QuizScreen(
+                                      dataModel: widget.dataModel,
+                                      quizID: widget.quizID,
+                                      time: widget.time,
+                                    )));
+                      },
                       style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.blue),
                           shape: RoundedRectangleBorder(
@@ -166,7 +186,18 @@ class _ResultScreenState extends State<ResultScreen> {
                         style: TextStyle(color: Colors.blue),
                       )),
                   OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QuizScreen(
+                                      dataModel: widget.dataModel,
+                                      quizID: widget.quizID,
+                                      time: widget.time,
+                                      selectedAnswers:
+                                          widget.result.selectedAnswers,
+                                    )));
+                      },
                       style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.purple),
                           shape: RoundedRectangleBorder(
@@ -176,7 +207,9 @@ class _ResultScreenState extends State<ResultScreen> {
                         style: TextStyle(color: Colors.purple),
                       )),
                   OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        
+                      },
                       style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.orange),
                           shape: RoundedRectangleBorder(
