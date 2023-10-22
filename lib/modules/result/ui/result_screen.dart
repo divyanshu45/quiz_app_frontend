@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ResultScreen extends StatefulWidget {
   final HistoryData result;
@@ -208,7 +209,23 @@ class _ResultScreenState extends State<ResultScreen> {
                       )),
                   OutlinedButton(
                       onPressed: () {
-                        
+                        final topics = widget.dataModel.topicViews();
+                        String topicName = '';
+                        String setName = '';
+
+                        outerLoop:
+                        for (var topic in topics) {
+                          for (var sets in topic.sets) {
+                            if (widget.quizID == sets.setId) {
+                              topicName = topic.title;
+                              setName = sets.title;
+                              break outerLoop;
+                            }
+                          }
+                        }
+
+                        Share.share(
+                            'I score ${getCorrectScore().toStringAsFixed(0)}% in $topicName quiz: $setName, Checkout the App: <link of app>.');
                       },
                       style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.orange),
