@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
@@ -7,12 +7,11 @@ import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/state_model.dart';
 
-class HistoryService {
-  static final instance = HistoryService._initialize();
+class HistoryService extends ChangeNotifier {
   HistoryModel historyModel = HistoryModel(data: []);
   final LocalStorage storage = LocalStorage('quiz_history_storage');
 
-  HistoryService._initialize() {
+  HistoryService.initialize() {
     initializeHistory();
   }
 
@@ -22,15 +21,25 @@ class HistoryService {
 
   readHistory() {
     storage.ready.then((value) {
-      historyModel = HistoryModel.fromJson(
-          jsonDecode(storage.getItem('quiz_test_history')));
+      historyModel =
+          HistoryModel.fromJson(jsonDecode(storage.getItem('quiz_history')));
+      notifyListeners();
     });
   }
 
   void addHistory(HistoryData data) {
+    // Remove last history if it's the same type and quiz id
+    for (int i = 0; i < historyModel.data!.length; i++) {
+      if (historyModel.data![i].quizType == data.quizType &&
+          historyModel.data![i].quizId == data.quizId) {
+        historyModel.data!.removeAt(i);
+      }
+    }
+
     historyModel.data!.add(data);
 
     writeHistory();
+    notifyListeners();
   }
 
   void writeHistory() {

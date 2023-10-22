@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_app/modules/home/models/Question/mixin/questions.dart';
 import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
@@ -61,9 +62,10 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   HistoryData saveHistory(List<QuestionsForQuizView> questions) {
+    final historyService = context.read<HistoryService>();
     int totalQuestions = questions.length;
     if (totalQuestions <= 0) {
-      return HistoryData(
+      final historyData = HistoryData(
           quizId: widget.quizID,
           quizType: HistoryService.getQuizType(widget.dataModel),
           correctQuestions: 0,
@@ -71,6 +73,10 @@ class _QuizScreenState extends State<QuizScreen> {
           missedQuestions: 0,
           selectedAnswers: [],
           totalQuestions: 0);
+
+      historyService.addHistory(historyData);
+
+      return historyData;
     }
 
     int quizId = widget.quizID;
@@ -87,7 +93,6 @@ class _QuizScreenState extends State<QuizScreen> {
         wrongQuestions++;
       }
     }
-    final historyService = HistoryService.instance;
 
     final historyData = HistoryData(
         quizId: quizId,

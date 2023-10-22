@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/learning_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 import 'package:quiz_app/modules/learning/ui/learningScreen.dart';
 import 'package:quiz_app/modules/quiz/ui/quiz_screen.dart';
+import 'package:quiz_app/services/local_history_service.dart';
 
 class SetScreen extends StatefulWidget {
   final String pageTitle;
@@ -52,8 +55,22 @@ class SetHolder extends StatelessWidget {
     return mainTopicViewObj is LearningModel;
   }
 
+  HistoryData? findHistory(BuildContext context) {
+    if (isLearning()) return null;
+    final historyService = context.watch<HistoryService>();
+    final quizType = HistoryService.getQuizType(mainTopicViewObj);
+    for (int i = 0; i < historyService.historyModel.data!.length; i++) {
+      if (historyService.historyModel.data![i].quizType == quizType &&
+          historyService.historyModel.data![i].quizId == setData.setId) {
+        return historyService.historyModel.data![i];
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final setHistory = findHistory(context);
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       decoration: BoxDecoration(
@@ -131,24 +148,44 @@ class SetHolder extends StatelessWidget {
                   SizedBox(
                     height: 2,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                        decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(4)),
-                        child: Text(
-                          'Not Attempted',
-                          style: TextStyle(
-                            fontSize: 10,
+                  if (setHistory == null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.redAccent,
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Text(
+                            'Not Attempted',
+                            style: TextStyle(
+                              fontSize: 10,
+                            ),
                           ),
-                        ),
-                      )
-                    ],
-                  )
+                        )
+                      ],
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Text(
+                            'Attempted, Score ${setHistory.correctQuestions}/${setHistory.totalQuestions}',
+                            style: TextStyle(
+                              fontSize: 10,
+                            ),
+                          ),
+                        )
+                      ],
+                    )
                 ]
             ],
           ),
