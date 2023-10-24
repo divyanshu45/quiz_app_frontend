@@ -417,7 +417,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final optionText = getOptionText(question[questionIndex], option);
     final color = getColorOption(question, questionIndex, option);
     return InkWell(
-      onTap: () {
+      onTap: () async {
         final isSelected = isQuestionAnswered(questionIndex);
         if (isSelected) return;
         if (timer != null) {
@@ -430,7 +430,7 @@ class _QuizScreenState extends State<QuizScreen> {
         final correctOptionIndex =
             getOptionInt(question[questionIndex].correctOption);
 
-        audioPlayer.stop();
+        await audioPlayer.stop();
         if (togglePlaySound) {
           if (correctOptionIndex == option) {
             audioPlayer.play(AssetSource('sounds/quiz-correct.mp3'));
@@ -439,7 +439,7 @@ class _QuizScreenState extends State<QuizScreen> {
           }
         }
         if (toggleVibrate) {
-          HapticFeedback.heavyImpact();
+          await HapticFeedback.heavyImpact();
         }
       },
       child: Container(
