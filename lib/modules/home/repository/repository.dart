@@ -4,6 +4,7 @@ import 'package:quiz_app/modules/home/models/Question/quiz_questions.dart';
 import 'package:quiz_app/modules/home/models/Question/state_questions.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/learning_model.dart';
+import 'package:quiz_app/modules/home/models/quiztypes/links_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/state_model.dart';
 
@@ -74,6 +75,13 @@ class Repository {
         queryParams: {"exam_set_id": id},
         token: 'J5uE1k9hX3yV7sN6i2wQ');
     final data = ExamQuestions.fromJson(response.data);
+    return data;
+  }
+
+  Future<LinksData> getLinks() async {
+    final response = await remoteService.get(
+        path: 'http://62.72.57.242/links/', token: 'J5uE1k9hX3yV7sN6i2wQ');
+    final data = LinksData.fromJson(response.data);
     return data;
   }
 }

@@ -19,12 +19,14 @@ class HomeFetchedState extends HomeState {
   final LearningModel practiceModel;
   final StateModel stateModel;
   final ExamModel examModel;
+  final LinksData linksData;
 
   const HomeFetchedState(
       {required this.quizModel,
       required this.practiceModel,
       required this.examModel,
-      required this.stateModel});
+      required this.stateModel,
+      required this.linksData});
 
   @override
   List<Object?> get props => [];

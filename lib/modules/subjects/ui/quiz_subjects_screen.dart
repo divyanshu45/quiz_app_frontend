@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_app/modules/home/models/quiztypes/mixin/topics_mixin.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/quiz_model.dart';
 import 'package:quiz_app/modules/topic/ui/topic_screen.dart';
 
