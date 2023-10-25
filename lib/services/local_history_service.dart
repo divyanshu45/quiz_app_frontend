@@ -21,8 +21,8 @@ class HistoryService extends ChangeNotifier {
 
   readHistory() {
     storage.ready.then((value) {
-      historyModel =
-          HistoryModel.fromJson(jsonDecode(storage.getItem('quiz_history')));
+      historyModel = HistoryModel.fromJson(
+          jsonDecode(storage.getItem('quiz_history') ?? '{"data": []}'));
       notifyListeners();
     });
   }

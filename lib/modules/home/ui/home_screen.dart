@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:quiz_app/modules/home/ui/widgets/quiz_model_card.dart';
 import 'package:quiz_app/modules/home/ui/widgets/topic_slider_container.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../bloc/home_bloc.dart';
+
+const bannerId = 'ca-app-pub-5503478750346013/3568074917';
+const interstitialId = 'ca-app-pub-5503478750346013/8990995828';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,9 +19,32 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  BannerAd? _bannerAd;
+
+  void loadAd() async {
+    await BannerAd(
+      adUnitId: bannerId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+          debugPrint('$ad loaded.');
+        },
+        onAdFailedToLoad: (ad, err) {
+          debugPrint('BannerAd failed to load: $err');
+          ad.dispose();
+        },
+      ),
+    ).load();
+  }
+
   @override
   void initState() {
     super.initState();
+    loadAd();
   }
 
   @override
@@ -68,6 +95,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       dataModel: state.practiceModel,
                       useHorizontalView: true,
                     ),
+                    if (_bannerAd != null)
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SafeArea(
+                            child: SizedBox(
+                              width: _bannerAd!.size.width.toDouble(),
+                              height: _bannerAd!.size.height.toDouble(),
+                              child: AdWidget(ad: _bannerAd!),
+                            ),
+                          ),
+                        ),
+                      )
                   ],
                 ),
               );

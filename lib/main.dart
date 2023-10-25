@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_app/modules/home/bloc/home_bloc.dart';
 import 'package:quiz_app/modules/home/ui/home_screen.dart';
@@ -10,6 +11,12 @@ import 'firebase_options.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+  MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(
+      testDeviceIds: ["AD75C6AC1432665FE0EB7FE9CAADEFA4"],
+    ),
+  );
   runApp(const MyApp());
 }
 

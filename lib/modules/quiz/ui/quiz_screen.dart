@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:quiz_app/modules/home/models/Question/mixin/questions.dart';
 import 'package:quiz_app/modules/home/models/history_model.dart';
 import 'package:quiz_app/modules/home/models/quiztypes/exam_model.dart';
@@ -30,10 +31,29 @@ class QuizScreen extends StatefulWidget {
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
+const interstitialId = 'ca-app-pub-5503478750346013/8990995828';
+
 class _QuizScreenState extends State<QuizScreen> {
   bool togglePlaySound = true;
   bool toggleHasTime = true;
   bool toggleVibrate = true;
+  InterstitialAd? _interstitialAd;
+
+  void loadAd() {
+    InterstitialAd.load(
+        adUnitId: interstitialId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          // Called when an ad is successfully received.
+          onAdLoaded: (ad) {
+            _interstitialAd = ad;
+          },
+          // Called when an ad request failed.
+          onAdFailedToLoad: (LoadAdError error) {
+            debugPrint('InterstitialAd failed to load: $error');
+          },
+        ));
+  }
 
   Future<GetQuestionsForQuizView>? question;
   bool isLocked = false;
@@ -138,6 +158,8 @@ class _QuizScreenState extends State<QuizScreen> {
                   time: widget.time,
                   result: result,
                 )));
+
+    _interstitialAd?.show();
   }
 
   void startTimer(List<QuestionsForQuizView> questions) {
@@ -166,6 +188,7 @@ class _QuizScreenState extends State<QuizScreen> {
   void initState() {
     super.initState();
     setFutureAndFetchQuiz();
+    loadAd();
     secondsLeft = widget.time;
     toggleHasTime = widget.selectedAnswers == null;
   }
